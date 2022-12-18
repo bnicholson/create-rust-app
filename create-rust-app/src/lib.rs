@@ -31,6 +31,9 @@ mod storage;
 #[cfg(feature = "plugin_storage")]
 pub use storage::{Attachment, AttachmentBlob, AttachmentData, Storage};
 
+#[cfg(feature = "log4rs")]
+pub use log4rs;
+
 mod mailer;
 pub use mailer::Mailer;
 
@@ -69,9 +72,11 @@ pub fn setup() -> AppData {
             panic!("ERROR: Could not load environment variables from dotenv file");
         }
 
-        #[cfg(feature = "backend_actix-web")]
-        env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
-        // diesel_migrations::embed_migrations!();
+        #[cfg(not(feature = "log_with_log4rs"))] {
+            #[cfg(feature = "backend_actix-web")]
+            env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
+            // diesel_migrations::embed_migrations!();
+        }
     }
 
     #[cfg(feature = "plugin_auth")]
